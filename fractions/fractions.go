@@ -1,25 +1,38 @@
 package main
 
 import (
+    "flag"
     "fmt"
     "math"
-    "os"
     "strconv"
 )
 
+func printHelp() {
+    fmt.Println("Usage:  fractions <lower percent> <upper percent>")
+}
+
 func main() {
-    percentages := os.Args[1:]
-    pLen := len(percentages)
+
+    helpShortPtr := flag.Bool("h", false, "help menu")
+    helpLongPtr := flag.Bool("help", false, "help menu")
+    flag.Parse()
+    if *helpShortPtr || *helpLongPtr {
+        printHelp()
+        return
+    }
+
+    args := flag.Args()
+    pLen := len(args)
     if pLen != 2 {
         fmt.Printf("Invalid number of percentages:  %d\n", pLen)
         return
     }
-    lowerP, err := strconv.ParseFloat(os.Args[1], 64)
+    lowerP, err := strconv.ParseFloat(args[0], 64)
     if err != nil {
         fmt.Printf("Error:  %s\n", err.Error())
         return
     }
-    upperP, err := strconv.ParseFloat(os.Args[2], 64)
+    upperP, err := strconv.ParseFloat(args[1], 64)
     if err != nil {
         fmt.Printf("Error:  %s\n", err.Error())
         return
@@ -32,6 +45,7 @@ func main() {
         fmt.Println("Values must be between 0 and 100")
         return
     }
+
     maxDivisor := int(math.Ceil(100.0 / (upperP - lowerP)))
     var divisor int
     var dividend int
