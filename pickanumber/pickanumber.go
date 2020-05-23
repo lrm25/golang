@@ -20,7 +20,17 @@ func main() {
     input, _ := reader.ReadString('\n')
     trimmedInput := strings.TrimSuffix(input, "\n")
 
-    inputNumber, _ := strconv.Atoi(trimmedInput)
+    inputNumber, err := strconv.Atoi(trimmedInput)
+    if err != nil {
+        fmt.Printf("Either '%s' isn't a number ", trimmedInput)
+        fmt.Printf("or you're trying to be too clever.  ")
+        fmt.Println("No decimals, pi, e, any of that shit.")
+        return
+    }
+    if inputNumber < 1 || 10 < inputNumber {
+        fmt.Println("I said between 1 and 10!")
+        return
+    }
     randomNumber := rand.Intn(10) + 1
 
     fmt.Printf("The number is %d\n", randomNumber)
