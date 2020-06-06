@@ -1,8 +1,11 @@
 package main
 
 import (
+    "bufio"
     "fmt"
     "math/rand"
+    "os"
+    "strings"
     "time"
 )
 
@@ -38,9 +41,28 @@ func playRound(bet int) int {
 }
 
 func main() {
+
+    reader := bufio.NewReader(os.Stdin)
+    money := 100
+    fmt.Printf("You have %d dollars\n", money)
+
     rand.Seed(time.Now().UnixNano())
-    money := 10
-    fmt.Printf("Betting %d dollars\n", money)
-    moneyLeft := playRound(money)
-    fmt.Printf("You now have %d dollars\n", moneyLeft)
+    for 0 < money {
+        fmt.Printf("Play round (y/n): ")
+        input, _ := reader.ReadString('\n')
+        answer := strings.TrimSpace(input)
+        if answer == "y" || answer == "Y" {
+            fmt.Printf("Betting 10 dollars\n")
+            money = money - 10 + playRound(10)
+            fmt.Printf("You now have %d dollars\n", money)
+        } else if answer == "n" || answer == "N" {
+            fmt.Println("Wuss")
+            break
+        } else {
+            fmt.Println("huh?")
+        }
+    }
+    if money == 0 {
+        fmt.Println("Time to go home.")
+    }
 }
