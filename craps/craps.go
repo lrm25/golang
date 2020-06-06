@@ -5,6 +5,7 @@ import (
     "fmt"
     "math/rand"
     "os"
+    "strconv"
     "strings"
     "time"
 )
@@ -52,9 +53,24 @@ func main() {
         input, _ := reader.ReadString('\n')
         answer := strings.TrimSpace(input)
         if answer == "y" || answer == "Y" {
-            fmt.Printf("Betting 10 dollars\n")
-            money = money - 10 + playRound(10)
-            fmt.Printf("You now have %d dollars\n", money)
+            for {
+                fmt.Printf("Place bet: ")
+                rawBetInput, _ := reader.ReadString('\n')
+                betString := strings.TrimSpace(rawBetInput)
+                bet, err := strconv.Atoi(betString)
+                if err != nil {
+                    fmt.Println("Integers please")
+                    continue
+                } else if bet <= 0 || money < bet {
+                    fmt.Println("More than 0, less than or what you have")
+                    continue
+                }
+                fmt.Printf("Betting %d dollars\n", bet)
+                money -= bet
+                money += playRound(bet)
+                fmt.Printf("You now have %d dollars\n", money)
+                break
+            }
         } else if answer == "n" || answer == "N" {
             fmt.Println("Wuss")
             break
