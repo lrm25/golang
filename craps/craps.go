@@ -18,24 +18,46 @@ func roll() int {
     return roll
 }
 
-func playRound(bet int) int {
+func playRound(bet int, passBet bool) int {
+
+    var pass bool
+    draw := false
+    complete := false
+
     rollOne := roll()
     if rollOne == 7 || rollOne == 11 {
-        fmt.Println("You win!")
-        return bet * 2
+        pass = true
+        complete = true
     }
-    if rollOne == 2 || rollOne == 3 || rollOne == 12 {
-        fmt.Println("You lose!")
-        return 0
+    if rollOne == 2 || rollOne == 3 {
+        pass = false
+        complete = true
     }
-    for {
+    if rollOne == 12 {
+        pass = false
+        draw = true
+        complete = true
+    }
+    for !complete {
         roll := roll()
         if roll == rollOne {
-            fmt.Println("You win!");
-            return bet * 2
+            pass = true
+            complete = true
         }
         if roll == 7 {
-            fmt.Println("You lose!");
+            pass = false
+            complete = true
+        }
+    }
+    if pass == passBet {
+        fmt.Println("You win!")
+        return bet * 2
+    } else {
+        if draw {
+            fmt.Println("Draw")
+            return bet
+        } else {
+            fmt.Println("You lose!")
             return 0
         }
     }
@@ -54,6 +76,21 @@ func main() {
         answer := strings.TrimSpace(input)
         if answer == "y" || answer == "Y" {
             for {
+                var pass bool
+                for {
+                    fmt.Printf("(p)ass/(d)on't: ")
+                    passInput, _ := reader.ReadString('\n')
+                    passString := strings.TrimSpace(passInput)
+                    if passString == "p" || passString == "d" {
+                        if passString == "p" {
+                            pass = true
+                        } else {
+                            pass = false
+                        }
+                        break
+                    }
+                    fmt.Println("p or d")
+                }
                 fmt.Printf("Place bet: ")
                 rawBetInput, _ := reader.ReadString('\n')
                 betString := strings.TrimSpace(rawBetInput)
@@ -67,7 +104,7 @@ func main() {
                 }
                 fmt.Printf("Betting %d dollars\n", bet)
                 money -= bet
-                money += playRound(bet)
+                money += playRound(bet, pass)
                 fmt.Printf("You now have %d dollars\n", money)
                 break
             }
