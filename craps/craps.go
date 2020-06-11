@@ -2,6 +2,7 @@ package main
 
 import (
     "bufio"
+    "flag"
     "fmt"
     "math/rand"
     "os"
@@ -10,11 +11,22 @@ import (
     "time"
 )
 
+var debugMode bool = false
+
 func roll() int {
-    dieOne := rand.Intn(5) + 1
-    dieTwo := rand.Intn(5) + 1
-    roll := dieOne + dieTwo
-    fmt.Printf("Roll:  %d\n", roll)
+    var roll int
+    if debugMode {
+        fmt.Printf("Enter roll: ")
+        reader := bufio.NewReader(os.Stdin)
+        rollInput, _ := reader.ReadString('\n')
+        rollString := strings.TrimSpace(rollInput)
+        roll, _ = strconv.Atoi(rollString)
+    } else {
+        dieOne := rand.Intn(5) + 1
+        dieTwo := rand.Intn(5) + 1
+        roll := dieOne + dieTwo
+        fmt.Printf("Roll:  %d\n", roll)
+    }
     return roll
 }
 
@@ -50,20 +62,26 @@ func playRound(bet int, passBet bool) int {
         }
     }
     if pass == passBet {
-        fmt.Println("You win!")
-        return bet * 2
-    } else {
         if draw {
             fmt.Println("Draw")
             return bet
         } else {
-            fmt.Println("You lose!")
-            return 0
+            fmt.Println("You win!")
+            return bet * 2
         }
+    } else {
+        fmt.Println("You lose!")
+        return 0
     }
 }
 
 func main() {
+
+    debugPtr := flag.Bool("debug", false, "debug mode")
+    flag.Parse()
+    if *debugPtr {
+        debugMode = true
+    }
 
     reader := bufio.NewReader(os.Stdin)
     money := 100
