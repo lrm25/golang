@@ -24,13 +24,13 @@ func roll() int {
     } else {
         dieOne := rand.Intn(5) + 1
         dieTwo := rand.Intn(5) + 1
-        roll := dieOne + dieTwo
-        fmt.Printf("Roll:  %d\n", roll)
+        roll = dieOne + dieTwo
     }
+    fmt.Printf("Roll:  %d\n", roll)
     return roll
 }
 
-func playRound(bet int, passBet bool) int {
+func doRolls(bet int, passBet bool) int {
 
     var pass bool
     draw := false
@@ -75,8 +75,47 @@ func playRound(bet int, passBet bool) int {
     }
 }
 
+func playSingleRound(reader *bufio.Reader, money int) int {
+
+    for {
+        var pass bool
+        for {
+            fmt.Printf("(p)ass/(d)on't: ")
+            passInput, _ := reader.ReadString('\n')
+            passString := strings.TrimSpace(passInput)
+            if passString == "p" || passString == "d" {
+                if passString == "p" {
+                    pass = true
+                } else {
+                    pass = false
+                }
+                break
+            }
+            fmt.Println("p or d")
+        }
+        fmt.Printf("Place bet: ")
+        rawBetInput, _ := reader.ReadString('\n')
+        betString := strings.TrimSpace(rawBetInput)
+        bet, err := strconv.Atoi(betString)
+        if err != nil {
+            fmt.Println("Integers please")
+            continue
+        } else if bet <= 0 || money < bet {
+            fmt.Println("More than 0, less than or what you have")
+            continue
+        }
+        fmt.Printf("Betting %d dollars\n", bet)
+        money -= bet
+        money += doRolls(bet, pass)
+        fmt.Printf("You now have %d dollars\n", money)
+        break
+    }
+    return money
+}
+
 func main() {
 
+    // debug mode allows a user to enter a specific roll
     debugPtr := flag.Bool("debug", false, "debug mode")
     flag.Parse()
     if *debugPtr {
@@ -89,46 +128,18 @@ func main() {
 
     rand.Seed(time.Now().UnixNano())
     for 0 < money {
+
         fmt.Printf("Play round (y/n): ")
         input, _ := reader.ReadString('\n')
         answer := strings.TrimSpace(input)
+
         if answer == "y" || answer == "Y" {
-            for {
-                var pass bool
-                for {
-                    fmt.Printf("(p)ass/(d)on't: ")
-                    passInput, _ := reader.ReadString('\n')
-                    passString := strings.TrimSpace(passInput)
-                    if passString == "p" || passString == "d" {
-                        if passString == "p" {
-                            pass = true
-                        } else {
-                            pass = false
-                        }
-                        break
-                    }
-                    fmt.Println("p or d")
-                }
-                fmt.Printf("Place bet: ")
-                rawBetInput, _ := reader.ReadString('\n')
-                betString := strings.TrimSpace(rawBetInput)
-                bet, err := strconv.Atoi(betString)
-                if err != nil {
-                    fmt.Println("Integers please")
-                    continue
-                } else if bet <= 0 || money < bet {
-                    fmt.Println("More than 0, less than or what you have")
-                    continue
-                }
-                fmt.Printf("Betting %d dollars\n", bet)
-                money -= bet
-                money += playRound(bet, pass)
-                fmt.Printf("You now have %d dollars\n", money)
-                break
-            }
+            money = playSingleRound(reader, money)
+
         } else if answer == "n" || answer == "N" {
             fmt.Println("Wuss")
             break
+
         } else {
             fmt.Println("huh?")
         }
