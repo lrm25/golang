@@ -31,7 +31,7 @@ jobs:
         fi
 
     - name: Make
-      run: pickanumber/make compile
+      run: pwd;pickanumber/make compile
 
     #- name: Test
     #  run: go test -v .
